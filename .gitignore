@@ -22,7 +22,7 @@ xgbsplay
 test_gbs
 gbs2gb
 gen_impulse_h
-impulse.h
+#impulse.h
 *.ho
 apidoc/
 libgbs.pc
