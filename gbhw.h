@@ -10,11 +10,11 @@
 #ifndef _GBHW_H_
 #define _GBHW_H_
 
-#include <inttypes.h>
-
 #include "common.h"
-#include "libgbs.h"
 #include "gbcpu.h"
+#include "libgbs.h"
+
+#include <inttypes.h>
 
 #define GBHW_CLOCK 4194304
 

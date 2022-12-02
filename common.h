@@ -15,7 +15,9 @@
 #include <errno.h>
 #include <string.h>
 
-#include "config.h"
+#ifndef GBS_VERSION
+#define GBS_VERSION "unknown"
+#endif
 
 typedef uint64_t cycles_t;
 
@@ -103,8 +105,16 @@ static inline void i18n_init(void) {}
 #endif
 
 #if !defined(__BYTE_ORDER__) || !defined(__ORDER_LITTLE_ENDIAN__) || !defined(__ORDER_BIG_ENDIAN__)
-#error Unsupported compiler
+#if __has_include(<SDL_endian.h>) || defined(SDL_BYTEORDER)
+#include <SDL_endian.h> // use SDL2 as a backup
+#define __BYTE_ORDER__ SDL_BYTEORDER
+#define __ORDER_LITTLE_ENDIAN__ SDL_LIL_ENDIAN
+#define __ORDER_BIG_ENDIAN__ SDL_BIG_ENDIAN
+#else
+#error Necessary defines for endianness not found. Please add SDL2 include folder to the include paths
+    or manually provide values for __BYTE_ORDER__, __ORDER_LITTLE_ENDIAN__, and __ORDER_BIG_ENDIAN__
 #endif
+
 #if __BYTE_ORDER__ != 1234 && __BYTE_ORDER__ != 4321
 #error Unexpected endian value __BYTE_ORDER__
 #endif
@@ -113,6 +123,7 @@ static inline void i18n_init(void) {}
 #endif
 #if __ORDER_BIG_ENDIAN__ != 4321
 #error Unexpected endian value
+#endif
 #endif
 
 #define GBS_BYTE_ORDER __BYTE_ORDER__

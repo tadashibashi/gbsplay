@@ -7,24 +7,20 @@
  * Licensed under GNU GPL v1 or, at your option, any later version.
  */
 
+#include "common.h"
+#include "crc32.h"
+#include "gbcpu.h"
+#include "gbhw.h"
+#include "gbs_internal.h"
+#include "libgbs.h"
+#include "mapper.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
-
-#include "common.h"
-#include "mapper.h"
-#include "gbhw.h"
-#include "gbcpu.h"
-#include "libgbs.h"
-#include "gbs_internal.h"
-#include "crc32.h"
-
 #ifdef USE_ZLIB
 #include <zlib.h>
 #endif
@@ -472,7 +468,7 @@ static uint32_t readint(const char* const buf, long bytes)
 
 long gbs_write(const struct gbs* const gbs, const char* const name)
 {
-	long fd;
+	FILE *fd;
 	char pad[16];
 	long newlen = gbs->filesize;
 	long namelen = strlen(name);
@@ -482,21 +478,21 @@ long gbs_write(const struct gbs* const gbs, const char* const name)
 	sprintf(&tmpname[namelen], ".tmp");
 	memset(pad, 0xff, sizeof(pad));
 
-	if ((fd = open(tmpname, O_WRONLY|O_CREAT|O_TRUNC, 0644)) == -1) {
+	if ((fopen_s(&fd, tmpname, "wb")) != 0) {
 		fprintf(stderr, _("Could not open %s: %s\n"), name, strerror(errno));
 		return 0;
 	}
 
-	if (write(fd, gbs->buf, newlen) == newlen) {
+	if (fwrite(gbs->buf, newlen, 1, fd) == 1) {
 		int ret = 1;
-		close(fd);
+		fclose(fd);
 		if (rename(tmpname, name) == -1) {
 			fprintf(stderr, _("Could not rename %s to %s: %s\n"), tmpname, name, strerror(errno));
 			ret = 0;
 		}
 		return ret;
 	}
-	close(fd);
+	fclose(fd);
 
 	return 1;
 }
@@ -558,7 +554,7 @@ const uint8_t *gbs_get_bootrom()
 	name_len = strlen(getenv("HOME")) + strlen(boot_rom_file) + 2;
 	bootname = malloc(name_len);
 	snprintf(bootname, name_len, "%s/%s", getenv("HOME"), boot_rom_file);
-	romf = fopen(bootname, "rb");
+	fopen_s(&romf, bootname, "rb");
 	free(bootname);
 	if (!romf) {
 		return NULL;
@@ -1236,7 +1232,7 @@ struct gbs* gbs_open(const char* const name)
 		fprintf(stderr, _("Could not open %s: %s\n"), name, strerror(errno));
 		return NULL;
 	}
-	if (fstat(fileno(f), &st) == -1) {
+	if (fstat(_fileno(f), &st) == -1) {
 		fprintf(stderr, _("Could not stat %s: %s\n"), name, strerror(errno));
 		goto exit_close;
 	}

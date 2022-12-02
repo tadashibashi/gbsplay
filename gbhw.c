@@ -7,17 +7,18 @@
  * Licensed under GNU GPL v1 or, at your option, any later version.
  */
 
-#include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <limits.h>
-#include <assert.h>
-#include <math.h>
-
 #include "gbcpu.h"
 #include "gbhw.h"
 #include "impulse.h"
+
+#include <assert.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 
 #define FILTER_CONST_OFF 1.0
 /* From blargg's "Game Boy Sound Operation" doc */
@@ -648,10 +649,12 @@ void gbhw_master_fade(struct gbhw* const gbhw, long speed, long dstvol)
 	else gbhw->master_fade = -speed;
 }
 
-#define GET_NIBBLE(p, n) ({ \
-	long index = ((n) >> 1) & 0xf; \
-	long shift = (~(n) & 1) << 2; \
-	(((p)[index] >> shift) & 0xf); })
+long GET_NIBBLE(const uint8_t *p, long n)
+{
+	long index = ((n) >> 1) & 0xf;
+	long shift = (~(n) & 1) << 2;
+	return (((p)[index] >> shift) & 0xf);
+}
 
 static void gb_flush_buffer(struct gbhw *gbhw)
 {
