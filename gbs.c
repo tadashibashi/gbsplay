@@ -478,7 +478,7 @@ long gbs_write(const struct gbs* const gbs, const char* const name)
 	sprintf(&tmpname[namelen], ".tmp");
 	memset(pad, 0xff, sizeof(pad));
 
-	if ((fopen_s(&fd, tmpname, "wb")) != 0) {
+	if (!(fd = fopen(tmpname, "wb"))) {
 		fprintf(stderr, _("Could not open %s: %s\n"), name, strerror(errno));
 		return 0;
 	}
@@ -554,7 +554,7 @@ const uint8_t *gbs_get_bootrom()
 	name_len = strlen(getenv("HOME")) + strlen(boot_rom_file) + 2;
 	bootname = malloc(name_len);
 	snprintf(bootname, name_len, "%s/%s", getenv("HOME"), boot_rom_file);
-	fopen_s(&romf, bootname, "rb");
+	romf = fopen(bootname, "rb");
 	free(bootname);
 	if (!romf) {
 		return NULL;
@@ -1232,7 +1232,7 @@ struct gbs* gbs_open(const char* const name)
 		fprintf(stderr, _("Could not open %s: %s\n"), name, strerror(errno));
 		return NULL;
 	}
-	if (fstat(_fileno(f), &st) == -1) {
+	if (fstat(fileno(f), &st) == -1) {
 		fprintf(stderr, _("Could not stat %s: %s\n"), name, strerror(errno));
 		goto exit_close;
 	}
