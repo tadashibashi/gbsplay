@@ -437,6 +437,10 @@ long gbs_toggle_mute(struct gbs* const gbs, long channel) {
 	return gbs->gbhw.ch[channel].mute ^= 1;
 }
 
+long gbs_set_mute(struct gbs* const gbs, long channel, long mute) {
+    return gbs->gbhw.ch[channel].mute = mute;
+}
+
 static void gbs_free(struct gbs* const gbs)
 {
 	gbhw_cleanup(&gbs->gbhw);
@@ -809,7 +813,7 @@ static struct gbs *vgm_open(const char* const name, char* const buf, size_t size
 	}
 	eof_ofs = le32(&buf[0x4]) + 0x4;
 	if (eof_ofs > size) {
-		fprintf(stderr, _("Bad file size in header: %ld\n"), eof_ofs);
+		fprintf(stderr, _("Bad file size in header: %u\n"), eof_ofs);
 		gbs_free(gbs);
 		return NULL;
 	}
@@ -1147,7 +1151,7 @@ static struct gbs* gbs_open_internal(const char* const name, char* const buf, si
 	gbs->rom[addr++] = jpaddr >> 8;
 
 	if (gbs->load < addr) {
-		fprintf(stderr, _("Load address %04x overlaps with replayer end %04x.\n"),
+		fprintf(stderr, _("Load address %04x overlaps with replayer end %04lx.\n"),
 			gbs->load, addr);
 		gbs_free(gbs);
 		return NULL;

@@ -15,7 +15,7 @@
 #include <errno.h>
 #include <string.h>
 
-#include "config.h"
+#define GBS_VERSION "unknown"
 
 typedef uint64_t cycles_t;
 
