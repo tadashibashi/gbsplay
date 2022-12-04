@@ -1017,6 +1017,11 @@ uint8_t gbhw_io_peek(const struct gbhw* const gbhw, uint16_t addr)
 	return 0xff;
 }
 
+const uint8_t *gbhw_io_get(const struct gbhw* const gbhw)
+{
+    return gbhw->ioregs;
+}
+
 
 void gbhw_check_if(struct gbhw *gbhw)
 {

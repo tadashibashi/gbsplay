@@ -147,6 +147,7 @@ void gbhw_calc_minmax(struct gbhw* const gbhw, int16_t *lmin, int16_t *lmax, int
 float gbhw_calc_timer_hz(uint8_t tac, uint8_t tma);
 cycles_t gbhw_step(struct gbhw* const gbhw, long time_to_work);
 uint8_t gbhw_io_peek(const struct gbhw* const gbhw, uint16_t addr);  /* unmasked peek */
+const uint8_t *gbhw_io_get(const struct gbhw* const gbhw);
 void gbhw_io_put(struct gbhw* const gbhw, uint16_t addr, uint8_t val);
 
 #endif

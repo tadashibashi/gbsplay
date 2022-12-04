@@ -9,10 +9,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <string.h>
 #include <ctype.h>
@@ -228,6 +225,11 @@ uint8_t gbs_io_peek(const struct gbs* const gbs, uint16_t addr) {
 	return gbhw_io_peek(&gbs->gbhw, addr);
 }
 
+const uint8_t *gbs_io_get(const struct gbs *const gbs)
+{
+    return gbhw_io_get(&gbs->gbhw);
+}
+
 static long chvol(const struct gbhw_channel channels[], long ch)
 {
 	long v;
@@ -438,7 +440,7 @@ long gbs_toggle_mute(struct gbs* const gbs, long channel) {
 }
 
 long gbs_set_mute(struct gbs* const gbs, long channel, long mute) {
-    return gbs->gbhw.ch[channel].mute = mute;
+    return gbs->gbhw.ch[channel].mute = mute & 1;
 }
 
 static void gbs_free(struct gbs* const gbs)
@@ -476,7 +478,7 @@ static uint32_t readint(const char* const buf, long bytes)
 
 long gbs_write(const struct gbs* const gbs, const char* const name)
 {
-	long fd;
+	FILE *fd;
 	char pad[16];
 	long newlen = gbs->filesize;
 	long namelen = strlen(name);
@@ -486,21 +488,21 @@ long gbs_write(const struct gbs* const gbs, const char* const name)
 	sprintf(&tmpname[namelen], ".tmp");
 	memset(pad, 0xff, sizeof(pad));
 
-	if ((fd = open(tmpname, O_WRONLY|O_CREAT|O_TRUNC, 0644)) == -1) {
+	if ((fd = fopen(tmpname, "wb"))) {
 		fprintf(stderr, _("Could not open %s: %s\n"), name, strerror(errno));
 		return 0;
 	}
 
-	if (write(fd, gbs->buf, newlen) == newlen) {
+	if (fwrite(gbs->buf, newlen, 1, fd) == 1) {
 		int ret = 1;
-		close(fd);
+		fclose(fd);
 		if (rename(tmpname, name) == -1) {
 			fprintf(stderr, _("Could not rename %s to %s: %s\n"), tmpname, name, strerror(errno));
 			ret = 0;
 		}
 		return ret;
 	}
-	close(fd);
+	fclose(fd);
 
 	return 1;
 }

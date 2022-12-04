@@ -53,6 +53,7 @@ typedef uint64_t cycles_t;
 #define FREQ(x) (262144 / (x))
 #define NOTE(x) ((long)((log(FREQ(x))/LN2 - MAGIC)*12 + .2))
 
+
 #if USE_I18N == 1
 
 #  include <locale.h>

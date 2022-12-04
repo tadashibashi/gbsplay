@@ -195,6 +195,7 @@ void gbs_configure_output(struct gbs* const gbs, struct gbs_output_buffer *buf, 
 const struct gbs_metadata *gbs_get_metadata(struct gbs* const gbs);
 long gbs_init(struct gbs* const gbs, long subsong);
 uint8_t gbs_io_peek(const struct gbs* const gbs, uint16_t addr);
+const uint8_t *gbs_io_get(const struct gbs* const gbs);
 const struct gbs_status* gbs_get_status(struct gbs* const gbs);
 long gbs_step(struct gbs* const gbs, long time_to_work);
 void gbs_set_nextsubsong_cb(struct gbs* const gbs, gbs_nextsubsong_cb cb, void *priv);
