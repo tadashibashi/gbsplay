@@ -85,6 +85,7 @@ struct gbhw {
 	long sample_rate;
 	long update_level;
 	long sequence_ctr;
+    long freeze_vblank;
 	cycles_t halted_noirq_cycles;
 
 	long vblankctr;

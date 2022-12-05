@@ -103,6 +103,7 @@ void gbhw_init_struct(struct gbhw *gbhw) {
 
 	gbhw->update_level = 0;
 	gbhw->sequence_ctr = 0;
+    gbhw->freeze_vblank = 0;
 	gbhw->halted_noirq_cycles = 0;
 
 	gbhw->timertc = 16;
@@ -770,7 +771,6 @@ static void gb_sound(struct gbhw *gbhw, cycles_t cycles)
 				gbhw->update_level = 1;
 			}
 		}
-
 		if (gbhw->ch[3].running) {
 			gbhw->ch[3].div_ctr--;
 			if (gbhw->ch[3].div_ctr <= 0) {
@@ -1084,7 +1084,6 @@ cycles_t gbhw_step(struct gbhw *gbhw, long time_to_work)
 	cycles_t cycles_total = 0;
 
 	time_to_work *= msec_cycles;
-	
 	while (cycles_total < time_to_work) {
 		long maxcycles = time_to_work - cycles_total;
 		cycles_t cycles = 0;
@@ -1109,10 +1108,17 @@ cycles_t gbhw_step(struct gbhw *gbhw, long time_to_work)
 			} else {
 				gbhw->halted_noirq_cycles = 0;
 			}
+
 			if (step < 0) return step;
 			cycles += step;
-			gbhw->sum_cycles += step;
-			gbhw->vblankctr -= step;
+
+            // Hack to freeze playback
+            if (!gbhw->freeze_vblank)
+            {
+                gbhw->sum_cycles += step;
+                gbhw->vblankctr -= step;
+            }
+
 			if (gbhw->vblankctr <= 0) {
 				gbhw->vblankctr += vblanktc;
 				gbhw->ioregs[REG_IF] |= 0x01;

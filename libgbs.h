@@ -209,5 +209,6 @@ long gbs_toggle_mute(struct gbs* const gbs, long channel);
 long gbs_set_mute(struct gbs* const gbs, long channel, long mute);
 void gbs_close(struct gbs* const gbs);
 long gbs_write(const struct gbs* const gbs, const char* const name);
-
+void gbs_freeze(struct gbs* gbs, long freeze);
+uint8_t gbs_get_version(const struct gbs *gbs);
 #endif

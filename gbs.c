@@ -1271,6 +1271,16 @@ exit_close:
 	return gbs;
 }
 
+void gbs_freeze(struct gbs* gbs, long freeze)
+{
+    gbs->gbhw.freeze_vblank = freeze;
+}
+
+uint8_t gbs_get_version(const struct gbs *gbs)
+{
+    return gbs->version;
+}
+
 struct gbs_internal_api gbs_internal_api = {
 	.version = GBS_VERSION,
 	.get_bootrom = gbs_get_bootrom,
